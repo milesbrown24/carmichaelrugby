@@ -1,0 +1,23 @@
+{
+  "name": "carmichael-hawks-rugby",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build --webpack",
+    "build:netlify": "npm run build",
+    "start": "npm run preview",
+    "check": "node scripts/check-content.mjs",
+    "test": "npm run check && node --test tests/site.test.mjs",
+    "preview": "node scripts/serve.mjs"
+  },
+  "dependencies": {
+    "next": "16.2.6",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
+  }
+}

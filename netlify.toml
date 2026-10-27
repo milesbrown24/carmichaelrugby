@@ -1,0 +1,24 @@
+[build]
+  command = "npm run build:netlify"
+  publish = "out"
+
+[build.environment]
+  NODE_VERSION = "22.13.1"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "SAMEORIGIN"
+
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Keep existing inbound links to the club's beginner guide working.
+[[redirects]]
+  from = "/wp-content/uploads/2016/01/Beginners-Guide-to-Rugby.pdf"
+  to = "/documents/beginners-guide-to-rugby.pdf"
+  status = 301
