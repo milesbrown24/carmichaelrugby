@@ -3,17 +3,34 @@ import { useEffect, useState } from "react";
 import { teams } from "../data/club";
 export default function ContactForm() {
   const [localMessage, setLocalMessage] = useState("");
+  const [sending, setSending] = useState(false);
   const [team, setTeam] = useState("");
   useEffect(() => {
     const requested = new URLSearchParams(window.location.search).get("team");
     if (teams.some((item) => item.id === requested)) setTeam(requested);
   }, []);
-  function onSubmit(event) {
+  async function onSubmit(event) {
+    event.preventDefault();
+    if (sending) return;
     if (["localhost", "127.0.0.1"].includes(window.location.hostname)) {
-      event.preventDefault();
-      setLocalMessage(
-        "This preview cannot send messages. Please email carmichaelhawks@gmail.com. The form will use Netlify Forms after deployment.",
-      );
+      setLocalMessage("This preview cannot send messages. Please email carmichaelhawks@gmail.com.");
+      return;
+    }
+    const body = new URLSearchParams(new FormData(event.currentTarget));
+    body.set("form-name", "hawks-inquiry");
+    setSending(true);
+    setLocalMessage("");
+    try {
+      const response = await fetch("/__forms.html", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body.toString(),
+      });
+      if (!response.ok) throw new Error("Question was not accepted");
+      window.location.assign("/thanks/");
+    } catch {
+      setLocalMessage("Your question could not be sent. Please try again or email carmichaelhawks@gmail.com. Your message is still here.");
+      setSending(false);
     }
   }
   return (
@@ -21,10 +38,9 @@ export default function ContactForm() {
       name="hawks-inquiry"
       method="POST"
       action="/thanks/"
-      data-netlify="true"
-      netlify-honeypot="bot-field"
       onSubmit={onSubmit}
       className="contact-form"
+      aria-busy={sending}
     >
       <input type="hidden" name="form-name" value="hawks-inquiry" />
       <p hidden>
@@ -89,8 +105,8 @@ export default function ContactForm() {
         For player questions, an age or school year is enough. Please leave out
         medical or other sensitive details.
       </p>
-      <button type="submit" className="button button-green">
-        Send question <span aria-hidden="true">↗</span>
+      <button type="submit" className="button button-green" disabled={sending}>
+        {sending ? "Sending…" : "Send question"} <span aria-hidden="true">↗</span>
       </button>
       {localMessage && (
         <p role="status" className="form-status">
