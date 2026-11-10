@@ -52,12 +52,15 @@ test("contact form is present in exported HTML for Netlify detection", () => {
   assert.match(html, /<form[^>]+name="hawks-inquiry"/);
   assert.match(html, /method="POST"/);
   assert.match(html, /action="\/thanks\/"/);
-  assert.match(html, /data-netlify="true"/);
+  const definition = fs.readFileSync(path.join(root, "__forms.html"), "utf8");
+  assert.match(definition, /data-netlify="true"/);
   assert.match(html, /This form is for questions only/);
-  assert.match(html, /netlify-honeypot="bot-field"/);
+  assert.match(definition, /netlify-honeypot="bot-field"/);
   assert.match(html, /name="form-name"[^>]+value="hawks-inquiry"/);
-  for (const name of ["name", "email", "message", "bot-field"])
+  for (const name of ["form-name", "name", "email", "topic", "team", "message", "bot-field"]) {
     assert.ok(html.includes('name="' + name + '"'));
+    assert.ok(definition.includes('name="' + name + '"'));
+  }
 });
 test("2027 registration, dues, practices and full schedules are published", () => {
   const registration = htmlFor("registration");
